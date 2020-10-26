@@ -40,14 +40,19 @@
    |cpu
       @0
          $reset = *reset;
+         $start = >>1$reset && !$reset ;
+         //valid signal
+         $valid = $reset ? 1'b0 : $start ? 1'b1 : >>3$valid ;
          //PC
-         $pc[31:0] = >>1$reset ? 0 : >>1$taken_br ? >>1$br_tgt_pc : (>>1$pc[31:0] + 32'd4);
+         $inc_pc[31:0] = $pc[31:0] + 32'd4;
+         $pc[31:0] = >>1$reset ? 0 : >>3$valid_taken_br ? >>3$br_tgt_pc : (>>3$inc_pc[31:0]);
          
          
          //Fetch
          $imem_rd_en = !>>1$reset;
          $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
       @1
+         $valid_taken_br = $valid && $taken_br;
          $instr[31:0] = $imem_rd_data[31:0];
          //Decode instruction type
          $is_i_instr = $instr[6:2] ==? 5'b0000x ||
@@ -116,7 +121,7 @@
                          $is_addi ? 
                          $src1_value[31:0] + $imm[31:0] : 32'bx ;
          // Register File Write
-         $rf_wr_en = ($rd == 5'b0) ? 1'b0 : $rd_valid;
+         $rf_wr_en = $rd_valid && $rd != 5'b0 && $valid;
          ?$rf_wr_en
             $rf_wr_index[4:0] = $rd[4:0];
       
