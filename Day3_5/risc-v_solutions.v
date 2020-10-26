@@ -86,14 +86,41 @@
          
          $dec_bits[10:0] = {$funct7[5], $funct3, $opcode};
          
-         $is_add = $dec_bits ==? 11'b0_000_0110011;
-         $is_addi = $dec_bits ==? 11'bx_000_0010011;         
+         $is_add = $dec_bits ==? 11'b0_000_0110011;//funct7 only present for r type
+         $is_addi = $dec_bits ==? 11'bx_000_0010011;
          $is_bge = $dec_bits ==? 11'bx_101_1100011;
          $is_beq = $dec_bits ==? 11'bx_000_1100011;
          $is_bne = $dec_bits ==? 11'bx_001_1100011;
          $is_blt = $dec_bits ==? 11'bx_100_1100011;
          $is_bltu = $dec_bits ==? 11'bx_110_1100011;
          $is_bgeu = $dec_bits ==? 11'bx_111_1100011;
+         
+         // Register File Read
+         
+         $rf_rd_en1 = $rs1_valid;
+         ?$rf_rd_en1
+            $rf_rd_index1[4:0] = $rs1[4:0];
+         
+         $rf_rd_en2 = $rs2_valid;
+         ?$rf_rd_en2
+            $rf_rd_index2[4:0] = $rs2[4:0];
+
+         
+         //ALU (just add and addi for now)
+         $src1_value[31:0] = $rf_rd_data1[31:0];
+         $src2_value[31:0] = $rf_rd_data2[31:0];
+         $result[31:0] = $is_add ?
+                         $src1_value[31:0] + $src2_value[31:0] :
+                         $is_addi ? 
+                         $src1_value[31:0] + $imm[31:0] : 32'bx ;
+         // Register File Write
+         $rf_wr_en = ($rd == 5'b0) ? 1'b0 : $rd_valid;
+         ?$rf_wr_en
+            $rf_wr_index[4:0] = $rd[4:0];
+      
+         $rf_wr_data[31:0] = $result[31:0];
+         
+         
          
 
 
@@ -113,7 +140,7 @@
    //  o CPU visualization
    |cpu
       m4+imem(@1)    // Args: (read stage)
-      //m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
+      m4+rf(@1, @1)  // Args: (read stage, write stage) - if equal, no register bypass is required
       //m4+dmem(@4)    // Args: (read/write stage)
    
    m4+cpu_viz(@4)    // For visualisation, argument should be at least equal to the last stage of CPU logic
