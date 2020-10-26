@@ -41,7 +41,9 @@
       @0
          $reset = *reset;
          //PC
-         $pc[31:0] = >>1$reset ? 0 : (>>1$pc[31:0] + 32'd4);
+         $pc[31:0] = >>1$reset ? 0 : >>1$taken_br ? >>1$br_tgt_pc : (>>1$pc[31:0] + 32'd4);
+         
+         
          //Fetch
          $imem_rd_en = !>>1$reset;
          $imem_rd_addr[M4_IMEM_INDEX_CNT-1:0] = $pc[M4_IMEM_INDEX_CNT+1:2];
@@ -119,18 +121,25 @@
             $rf_wr_index[4:0] = $rd[4:0];
       
          $rf_wr_data[31:0] = $result[31:0];
+         // branch instructions
+         $taken_br = $is_beq ? ($src1_value == $src2_value) :
+                     $is_bne ? ($src1_value != $src2_value) :
+                     $is_blt ? (($src1_value < $src2_value) ^ ($src1_value[31] != $src2_value[31])) :
+                     $is_bge ? (($src1_value >= $src2_value) ^ ($src1_value[31] != $src2_value[31])) :
+                     $is_bltu ? ($src1_value < $src2_value) :
+                     $is_bgeu ? ($src1_value >= $src2_value) : 1'b0;
          
-         
-         
+         $br_tgt_pc[31:0] = $pc[31:0] + $imm[31:0];
 
 
       // Note: Because of the magic we are using for visualisation, if visualisation is enabled below,
       //       be sure to avoid having unassigned signals (which you might be using for random inputs)
       //       other than those specifically expected in the labs. You'll get strange errors for these.
 
-         `BOGUS_USE($is_beq $is_bne $is_blt $is_bge $is_bltu $is_bgeu $is_add $is_addi)
+         `BOGUS_USE($is_addi $is_add $is_beq $is_bne $is_blt $is_bge $is_bltu $is_bgeu $imm $imem_rd_en $imem_rd_addr $rd $rs1 $rs2)
        // Assert these to end simulation (before Makerchip cycle limit).
-   *passed = *cyc_cnt > 40;
+   //*passed = *cyc_cnt > 40;
+   *passed = |cpu/xreg[10]>>5$value == (1+2+3+4+5+6+7+8+9);
    *failed = 1'b0;
    
    // Macro instantiations for:
