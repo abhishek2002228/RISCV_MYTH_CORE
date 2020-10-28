@@ -6,7 +6,7 @@ Made The Microarchitecture for a RISCV core, which has support of base integer R
 
 Day1-2 was focussed on how an application written in higher level language communicates with the processor
 
-Day3-5 was all about Computer Architecture, the RISCV ISA and Implementing a 3 stage pipelined RISCV Core
+Day3-5 was all about Computer Architecture, the RISCV ISA and Implementing a 5 stage pipelined RISCV Core
 
 The order of desgining the logic for the core was as follows:
 
