@@ -1,6 +1,6 @@
 # RISC-V_MYTH_Core
 
-Made The Microarchitecture for a RISCV core, which has support of base interger RV32I instruction format using TL Verilog and Makerchip IDE. This also has a sub-project which involved making a pipelined Calculator. This was done as a part of a 5-day workshop.
+Made The Microarchitecture for a RISCV core, which has support of base integer RV32I instruction format using TL Verilog and Makerchip IDE. This also has a sub-project which involved making a pipelined calculator. This was done as a part of a 5-day workshop.
 
 ![](Day3_5/Final.png) 
 
@@ -38,7 +38,7 @@ The order of desgining the logic for the core was as follows:
 
 7) Load and store instructions for accessing the data memory
 
-Apart from this, hazards like Control flow hazard and read after write hazard were addressed by analysing the waterfall logic diagram and solutions like Register File Bypass.
+Apart from this, hazards like control flow hazard and read after write hazard were addressed by analysing the waterfall logic diagram and solutions like Register File Bypass.
 
 The slides used can be found [here](https://drive.google.com/file/d/1tqvXmFru31-tezDX30jTNJoLcQk308UM/view)
 
